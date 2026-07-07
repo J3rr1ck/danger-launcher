@@ -1,0 +1,54 @@
+name: Build and Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build Flutter APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.5'
+          channel: 'stable'
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Build APK (debug)
+        run: flutter build apk --debug
+
+      - name: Rename APK
+        run: |
+          cp build/app/outputs/flutter-apk/app-debug.apk \
+             danger-launcher-v0.0.1.apk
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Danger Launcher ${{ github.ref_name }}"
+          body: |
+            ## Danger Launcher ${{ github.ref_name }}
+
+            Custom Android/Pixel launcher with:
+            - **iOS 26 Liquid Glass** design language
+            - **Google Now** newsfeed (left screen)
+            - **Gemini** app integration
+            - Layered glass icons with depth effects
+            - Dynamic wallpapers with ambient particles
+            - Fluid animations and glass morphism controls
+
+            ### Installation
+            Download the APK and install on your Pixel/Android device.
+          files: |
+            danger-launcher-v0.0.1.apk
+          fail_on_unmatched: true
+          generate_release_notes: true
