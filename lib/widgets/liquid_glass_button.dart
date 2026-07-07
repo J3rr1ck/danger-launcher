@@ -209,7 +209,7 @@ class _LiquidGlassShimmerState extends State<LiquidGlassShimmer>
               stops: const [0.0, 0.5, 1.0],
             ).createShader(rect);
           },
-          blendMode: BlendMode.add,
+          blendMode: BlendMode.plus,
           child: child,
         );
       },

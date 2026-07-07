@@ -572,7 +572,7 @@ class _HomeScreenState extends State<HomeScreen>
                         'Type to search across apps, contacts, and Gemini',
                         style: TextStyle(
                           fontSize: 15,
-                          color: isDark ? Colors.white50 : Colors.black45,
+                          color: isDark ? Colors.white.withOpacity(0.5) : Colors.black45,
                         ),
                       ),
                     ],

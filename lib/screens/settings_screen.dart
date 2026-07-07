@@ -106,7 +106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildTriggerTile(
                     'Long-press Home',
                     'Hold on home screen for Gemini quick search',
-                    Icons.long_press,
+                    Icons.touch_app_outlined,
                     'longPressHome',
                     theme,
                     isDark,
@@ -114,7 +114,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildTriggerTile(
                     'Edge Swipe',
                     'Swipe from screen edge to launch Gemini',
-                    Icons.edge_screw,
+                    Icons.swipe_vertical_outlined,
                     'edgeSwipe',
                     theme,
                     isDark,

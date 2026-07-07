@@ -3,7 +3,7 @@ description: "Danger Launcher - Android/Pixel custom launcher with iOS 26 Liquid
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 0.0.1
 
 environment:
   sdk: ^3.7.0
@@ -11,24 +11,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # Launcher core
-  android_intent_helper: ^0.2.0
-  package_info_plus: ^8.0.0
   shared_preferences: ^2.3.0
-  # UI
-  glassmorphism: ^2.0.0
-  animations: ^2.0.0
-  # Feed & News
   http: ^1.2.0
-  # Gemini AI
-  google_generative_ai: ^0.4.0
-  # Device info & services
-  device_info_plus: ^11.0.0
-  # Icons & theming
-  dynamic_color: ^4.0.0
-  # Storage
   sqflite: ^2.4.0
   path_provider: ^2.1.0
+  package_info_plus: ^8.0.0
 
 dev_dependencies:
   flutter_test:

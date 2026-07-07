@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'screens/home_screen.dart';
@@ -46,7 +47,7 @@ class _DangerLauncherAppState extends State<DangerLauncherApp> {
         brightness: Brightness.light,
         scaffoldBackgroundColor: const Color(0xFFF5F5F5),
         colorSchemeSeed: const Color(0xFF6366F1),
-        pageTransitionsTheme: const PageTransitionsTheme(
+        pageTransitionsTheme: PageTransitionsTheme(
           builders: {
             TargetPlatform.android: CupertinoPageTransitionsBuilder(),
           },
@@ -57,7 +58,7 @@ class _DangerLauncherAppState extends State<DangerLauncherApp> {
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xFF0A0A0A),
         colorSchemeSeed: const Color(0xFF818CF8),
-        pageTransitionsTheme: const PageTransitionsTheme(
+        pageTransitionsTheme: PageTransitionsTheme(
           builders: {
             TargetPlatform.android: CupertinoPageTransitionsBuilder(),
           },

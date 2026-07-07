@@ -1,4 +1,4 @@
-package com.danger.launcher
+package com.example.danger_launcher
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo

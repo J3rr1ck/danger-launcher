@@ -1,21 +1,12 @@
-package com.danger.launcher
+package com.example.danger_launcher
 
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import androidx.core.content.ContextCompat
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-/**
- * Danger Launcher - Android/Pixel custom launcher with iOS 26 Liquid Glass design
- * and Gemini AI integration.
- */
 class MainActivity : FlutterActivity() {
     companion object {
         private const val TAG = "DangerLauncher"
@@ -69,7 +60,6 @@ class MainActivity : FlutterActivity() {
                 startActivity(intent)
                 result.success(true)
             } else {
-                // Fallback: try opening Google Assistant
                 val assistantIntent = Intent(Intent.ACTION_VOICE_COMMAND)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(assistantIntent)
@@ -85,14 +75,12 @@ class MainActivity : FlutterActivity() {
         try {
             val intent = packageManager.getLaunchIntentForPackage("com.google.android.gemini")
             if (intent != null) {
-                // Open Gemini with voice input intent
                 intent.action = "android.intent.action.VOICE_COMMAND"
                 intent.putExtra("android.intent.extra.VOICE_QUERY", true)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 startActivity(intent)
                 result.success(true)
             } else {
-                // Fallback to Assistant voice
                 val voiceIntent = Intent(Intent.ACTION_VOICE_COMMAND)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(voiceIntent)
@@ -107,7 +95,7 @@ class MainActivity : FlutterActivity() {
     private fun triggerGeminiTextQuery(query: String, result: MethodChannel.Result) {
         try {
             val intent = Intent()
-            intent.package = "com.google.android.gemini"
+            intent.setPackage("com.google.android.gemini")
             intent.action = Intent.ACTION_SEND
             intent.type = "text/plain"
             intent.putExtra(Intent.EXTRA_TEXT, query)

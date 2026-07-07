@@ -101,34 +101,35 @@ class NewsFeedService {
   }
 
   List<NewsArticle> _getDemoArticles() {
+    final now = DateTime.now();
     return [
-      const NewsArticle(
+      NewsArticle(
         title: 'Pixel 10 Pro: What to Expect',
         description: 'Google\'s next flagship pushes AI-native computing with Gemini integration.',
         source: 'Android Central',
         url: '',
-        publishedAt: DateTime.now(),
+        publishedAt: now,
       ),
-      const NewsArticle(
+      NewsArticle(
         title: 'iOS 26 Liquid Glass Design',
         description: 'Apple\'s new design language transforms how users interact with their devices.',
         source: 'TechCrunch',
         url: '',
-        publishedAt: DateTime.now(),
+        publishedAt: now,
       ),
-      const NewsArticle(
+      NewsArticle(
         title: 'Gemini Nano Now Runs on-device',
         description: 'Google\'s lightweight AI model is available directly on Pixel devices.',
         source: 'The Verge',
         url: '',
-        publishedAt: DateTime.now(),
+        publishedAt: now,
       ),
-      const NewsArticle(
+      NewsArticle(
         title: 'Material You evolves with AI',
         description: 'Dynamic theming gets smarter with contextual color adaptation.',
         source: 'Android Authority',
         url: '',
-        publishedAt: DateTime.now(),
+        publishedAt: now,
       ),
     ];
   }
