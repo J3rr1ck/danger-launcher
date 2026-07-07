@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'models/installed_app.dart';
 import 'services/launcher_api.dart';
 import 'screens/home_screen.dart';
 import 'screens/news_feed.dart';
