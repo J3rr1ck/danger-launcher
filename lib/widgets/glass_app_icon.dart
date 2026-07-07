@@ -1,16 +1,18 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import '../models/app_item.dart';
+import 'package:flutter/services.dart';
+import '../models/installed_app.dart';
 
-/// Liquid Glass layered app icon widget.
-/// iOS 26 style: multi-layer depth, glass refraction, light interaction.
 class GlassAppIcon extends StatefulWidget {
-  final AppItem app;
+  final InstalledApp app;
   final VoidCallback? onTap;
+  final double size;
 
   const GlassAppIcon({
     super.key,
     required this.app,
     this.onTap,
+    this.size = 64,
   });
 
   @override
@@ -21,6 +23,7 @@ class _GlassAppIconState extends State<GlassAppIcon>
     with SingleTickerProviderStateMixin {
   late final AnimationController _glowController;
   bool _pressed = false;
+  Image? _iconImage;
 
   @override
   void initState() {
@@ -29,6 +32,24 @@ class _GlassAppIconState extends State<GlassAppIcon>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
+    _loadIcon();
+  }
+
+  Future<void> _loadIcon() async {
+    try {
+      final channel = MethodChannel(
+        'com.danger.danger_launcher/launcher',
+      );
+      final Uint8List? bytes = await channel.invokeMethod<Uint8List>(
+        'getAppIcon',
+        {'packageName': widget.app.packageName},
+      );
+      if (bytes != null && mounted) {
+        setState(() {
+          _iconImage = Image.memory(bytes, fit: BoxFit.contain);
+        });
+      }
+    } catch (_) {}
   }
 
   @override
@@ -48,32 +69,32 @@ class _GlassAppIconState extends State<GlassAppIcon>
         animation: _glowController,
         builder: (context, child) {
           final glow = _glowController.value;
+          final size = widget.size;
+          final iconSize = size * 0.5;
           return AnimatedScale(
             scale: _pressed ? 0.9 : 1.0,
             duration: const Duration(milliseconds: 150),
             child: Container(
-              width: 68,
-              height: 68,
+              width: size,
+              height: size,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(size * 0.27),
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    widget.app.color.withOpacity(0.85),
-                    widget.app.color.withOpacity(0.65),
-                    widget.app.color.withOpacity(0.5),
+                    const Color(0xFF8B5CF6).withOpacity(0.85),
+                    const Color(0xFF6C63FF).withOpacity(0.65),
+                    const Color(0xFF5B47FF).withOpacity(0.5),
                   ],
                 ),
                 boxShadow: [
-                  // Liquid Glass depth shadow
                   BoxShadow(
-                    color: widget.app.color.withOpacity(0.3 * glow),
+                    color: const Color(0xFF8B5CF6).withOpacity(0.3 * glow),
                     blurRadius: 16 * (0.5 + glow * 0.5),
                     spreadRadius: 1,
                     offset: const Offset(0, 4),
                   ),
-                  // Inner glass reflection
                   BoxShadow(
                     color: Colors.white.withOpacity(0.15 * glow),
                     blurRadius: 8,
@@ -89,29 +110,22 @@ class _GlassAppIconState extends State<GlassAppIcon>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Layered icon with depth effect
-                  Stack(
-                    children: [
-                      // Back layer (glass refraction)
-                      Opacity(
-                        opacity: 0.3,
-                        child: Icon(widget.app.icon,
-                            size: 28,
-                            color: Colors.white.withOpacity(0.5)),
+                  // App icon or fallback
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox(
+                      width: iconSize,
+                      height: iconSize,
+                      child: _iconImage ?? Icon(
+                        Icons.app_box_outlined,
+                        color: Colors.white.withOpacity(0.7),
+                        size: iconSize * 0.7,
                       ),
-                      // Front layer
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 1, top: 1),
-                        child: Icon(widget.app.icon,
-                            size: 28, color: Colors.white),
-                      ),
-                    ],
+                    ),
                   ),
                   const SizedBox(height: 4),
-                  // Name label with iOS style
                   Text(
-                    widget.app.name,
+                    widget.app.appName,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.9),
                       fontSize: 11,
@@ -119,6 +133,7 @@ class _GlassAppIconState extends State<GlassAppIcon>
                     ),
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ],
               ),

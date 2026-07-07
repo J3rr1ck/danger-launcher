@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class NewsFeedScreen extends StatefulWidget {
-  const NewsFeedScreen({super.key});
+  final VoidCallback? onHome;
+
+  const NewsFeedScreen({super.key, this.onHome});
 
   @override
   State<NewsFeedScreen> createState() => _NewsFeedScreenState();
@@ -55,8 +56,6 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
         ));
       }
     }
-
-    // Shuffle for organic feel but keep grouped
     _feedItems.shuffle();
   }
 
@@ -67,7 +66,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
+          colors: const [
             Color(0xFF1a1a2e),
             Color(0xFF16213e),
             Color(0xFF0f0f1a),
@@ -77,12 +76,8 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       child: SafeArea(
         child: Column(
           children: [
-            // Google Now header with Liquid Glass styling
             _buildHeader(),
-            // Feed content
-            Expanded(
-              child: _buildFeed(),
-            ),
+            Expanded(child: _buildFeed()),
           ],
         ),
       ),
@@ -102,7 +97,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.auto_awesome,
+          const Icon(Icons.auto_awesome,
               color: Color(0xFF8B5CF6), size: 28),
           const SizedBox(width: 12),
           Text(
@@ -128,9 +123,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       physics: const BouncingScrollPhysics(),
       itemCount: _feedItems.length + 1,
       itemBuilder: (context, index) {
-        if (index == 0) {
-          return _buildWeatherCard();
-        }
+        if (index == 0) return _buildWeatherCard();
         final item = _feedItems[index - 1];
         return _buildNewsCard(item);
       },
@@ -143,7 +136,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
@@ -165,15 +158,12 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
+            children: const [
+              Text(
                 'San Francisco',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.white70, fontSize: 14),
               ),
-              const Text(
+              Text(
                 '72°F',
                 style: TextStyle(
                   color: Colors.white,
@@ -230,7 +220,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
               color: Colors.white.withOpacity(0.1),
             ),
             child: Icon(item.icon,
-                color: Color(0xFF8B5CF6), size: 22),
+                color: const Color(0xFF8B5CF6), size: 22),
           ),
           const SizedBox(width: 14),
           Expanded(

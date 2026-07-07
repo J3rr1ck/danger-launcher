@@ -1,22 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'launcher_home.dart';
-import 'news_feed.dart';
+import 'services/launcher_api.dart';
+import 'screens/home_screen.dart';
+import 'screens/news_feed.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarDividerColor: Colors.transparent,
   ));
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
   runApp(const DangerLauncherApp());
 }
 
-class DangerLauncherApp extends StatelessWidget {
+class DangerLauncherApp extends StatefulWidget {
   const DangerLauncherApp({super.key});
+
+  @override
+  State<DangerLauncherApp> createState() => _DangerLauncherAppState();
+}
+
+class _DangerLauncherAppState extends State<DangerLauncherApp> {
+  final LauncherApi _api = LauncherApi();
+  List<InstalledApp> _allApps = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadApps();
+  }
+
+  Future<void> _loadApps() async {
+    final apps = await _api.getInstalledApps();
+    setState(() => _allApps = apps);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,35 +46,39 @@ class DangerLauncherApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.transparent,
         useMaterial3: true,
       ),
-      home: const LauncherRoot(),
-      routes: {
-        '/feed': (context) => const NewsFeedScreen(),
-      },
+      home: LauncherRoot(
+        allApps: _allApps,
+        api: _api,
+        onRefresh: _loadApps,
+      ),
     );
   }
 }
 
 class LauncherRoot extends StatefulWidget {
-  const LauncherRoot({super.key});
+  final List<InstalledApp> allApps;
+  final LauncherApi api;
+  final VoidCallback onRefresh;
+
+  const LauncherRoot({
+    super.key,
+    required this.allApps,
+    required this.api,
+    required this.onRefresh,
+  });
 
   @override
   State<LauncherRoot> createState() => _LauncherRootState();
 }
 
 class _LauncherRootState extends State<LauncherRoot>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final PageController _pageController;
-  double _currentPage = 0.0;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 1);
-    _pageController.addListener(() {
-      setState(() {
-        _currentPage = _pageController.page ?? 1.0;
-      });
-    });
   }
 
   @override
@@ -65,34 +87,58 @@ class _LauncherRootState extends State<LauncherRoot>
     super.dispose();
   }
 
-  void _onPageChanged(int page) {
-    HapticFeedback.lightImpact();
-  }
-
-  void _navigateToFeed() {
-    _pageController.animateToPage(0,
-        duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-  }
-
-  void _navigateToHome() {
-    _pageController.animateToPage(1,
-        duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: _onPageChanged,
-        physics: const ClampingScrollPhysics(),
+      body: Stack(
         children: [
-          // Left screen: Google Now feed
-          const NewsFeedScreen(),
-          // Main home screen
-          LauncherHomeScreen(
-            onOpenFeed: _navigateToFeed,
-            onHome: _navigateToHome,
+          // Page-based navigation: feed | home
+          PageView(
+            controller: _pageController,
+            onPageChanged: (_) => HapticFeedback.lightImpact(),
+            children: [
+              NewsFeedScreen(onHome: () => _pageController.animateToPage(1,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut)),
+              HomeScreen(
+                apps: widget.allApps,
+                api: widget.api,
+                onRefresh: widget.onRefresh,
+                onOpenFeed: () => _pageController.animateToPage(0,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut),
+                onHome: () => _pageController.animateToPage(1,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut),
+              ),
+            ],
+          ),
+          // Home indicator pill
+          Positioned(
+            bottom: 8,
+            left: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap: () => _pageController.animateToPage(1,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOut),
+              child: Center(
+                child: Container(
+                  width: 36,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: Colors.white.withOpacity(0.8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),

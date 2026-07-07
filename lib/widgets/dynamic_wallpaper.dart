@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 /// Dynamic wallpaper with Liquid Glass depth layers.
-/// iOS 26 style: adaptive, fluid backgrounds with light interaction.
 class DynamicWallpaper extends StatefulWidget {
   const DynamicWallpaper({super.key});
 
@@ -28,7 +27,6 @@ class _DynamicWallpaperState extends State<DynamicWallpaper>
       duration: const Duration(seconds: 6),
     )..repeat(reverse: true);
 
-    // Create ambient particles for glass depth effect
     for (var i = 0; i < 24; i++) {
       _particles.add(_Particle(
         Random().nextDouble(),
@@ -57,12 +55,12 @@ class _DynamicWallpaperState extends State<DynamicWallpaper>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF0f0c29),
-            const Color(0xFF302b63),
-            const Color(0xFF24243e),
+          colors: const [
+            Color(0xFF0f0c29),
+            Color(0xFF302b63),
+            Color(0xFF24243e),
           ],
-          stops: const [0.0, 0.5, 1.0],
+          stops: [0.0, 0.5, 1.0],
         ),
       ),
       child: CustomPaint(
