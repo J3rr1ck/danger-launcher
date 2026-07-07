@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build Flutter APK
@@ -50,5 +53,5 @@ jobs:
             Download the APK and install on your Pixel/Android device.
           files: |
             danger-launcher-v0.0.1.apk
-          fail_on_unmatched: true
+          fail_on_unmatched_files: true
           generate_release_notes: true
