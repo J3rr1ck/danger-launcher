@@ -61,7 +61,7 @@ class MainActivity : FlutterActivity() {
             apps.add(app)
         }
 
-        return apps.sortedBy { it["appName"] }
+        return apps.sortedBy { it["appName"] as? String }
     }
 
     private fun launchApp(packageName: String): Boolean {
