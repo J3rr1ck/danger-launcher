@@ -1,8 +1,8 @@
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../models/installed_app.dart';
 
-/// Platform channel bridge to Android's PackageManager.
 class LauncherApi {
   static const MethodChannel _channel = MethodChannel(
     'com.danger.danger_launcher/launcher',

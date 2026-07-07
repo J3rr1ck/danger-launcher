@@ -13,7 +13,7 @@ class InstalledApp {
     required this.activityName,
   });
 
-  Future<Uint8List?> get iconBytes => _iconBytes;
+  Uint8List? get iconBytes => _iconBytes;
 
   setIconBytes(Uint8List? bytes) {
     _iconBytes = bytes;

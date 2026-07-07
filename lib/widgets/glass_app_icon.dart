@@ -117,7 +117,7 @@ class _GlassAppIconState extends State<GlassAppIcon>
                       width: iconSize,
                       height: iconSize,
                       child: _iconImage ?? Icon(
-                        Icons.app_box_outlined,
+                        Icons.apps,
                         color: Colors.white.withOpacity(0.7),
                         size: iconSize * 0.7,
                       ),
