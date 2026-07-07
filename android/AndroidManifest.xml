@@ -1,0 +1,53 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.danger.launcher"
+    android:versionCode="1"
+    android:versionName="1.0.0">
+
+    <!-- Launcher permissions -->
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Launcher intent filter -->
+    <application
+        android:label="Danger Launcher"
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@style/Theme.DangerLauncher"
+        android:hardwareAccelerated="true"
+        android:supportsRtl="true">
+
+        <!-- Main launcher activity -->
+        <activity
+            android:name=".MainActivity"
+            android:label="Danger Launcher"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="adjustResize"
+            android:windowBackground="@android:color/transparent">
+
+            <!-- Launcher category -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- App search/resolve -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Gemini trigger service -->
+        <service
+            android:name=".GeminiTriggerService"
+            android:exported="false"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+
+    </application>
+</manifest>
