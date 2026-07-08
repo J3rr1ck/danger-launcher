@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../models/installed_app.dart';
 
+/// Platform channel bridge to Android's PackageManager.
 class LauncherApi {
   static const MethodChannel _channel = MethodChannel(
     'com.danger.danger_launcher/launcher',
@@ -41,6 +42,39 @@ class LauncherApi {
     } catch (e) {
       debugPrint('getAppIcon error: $e');
       return null;
+    }
+  }
+}
+
+/// Platform channel for local weather data.
+class WeatherApi {
+  static const MethodChannel _channel = MethodChannel(
+    'com.danger.danger_launcher/weather',
+  );
+
+  Future<Map<String, dynamic>> getWeather() async {
+    try {
+      final Map<String, dynamic> result = await _channel.invokeMethod<Map<String, dynamic>>('getWeather');
+      return result;
+    } catch (e) {
+      debugPrint('getWeather error: $e');
+      return {'success': false, 'temperature': 72, 'condition': 'Sunny', 'city': 'San Francisco'};
+    }
+  }
+}
+
+/// Platform channel for RSS feed fetching.
+class RssApi {
+  static const MethodChannel _channel = MethodChannel(
+    'com.danger.danger_launcher/rss',
+  );
+
+  Future<String> fetchRss(String url) async {
+    try {
+      return await _channel.invokeMethod<String>('fetchRss', {'url': url}) ?? '';
+    } catch (e) {
+      debugPrint('fetchRss error: $e');
+      return '';
     }
   }
 }

@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../models/installed_app.dart';
+import '../services/launcher_api.dart';
 
+/// Liquid Glass layered app icon widget.
+/// iOS 26 style: multi-layer depth, glass refraction, light interaction.
 class GlassAppIcon extends StatefulWidget {
   final InstalledApp app;
   final VoidCallback? onTap;
@@ -23,7 +25,10 @@ class _GlassAppIconState extends State<GlassAppIcon>
     with SingleTickerProviderStateMixin {
   late final AnimationController _glowController;
   bool _pressed = false;
-  Image? _iconImage;
+  Uint8List? _iconBytes;
+  bool _loading = true;
+
+  static final LauncherApi _api = LauncherApi();
 
   @override
   void initState() {
@@ -37,19 +42,16 @@ class _GlassAppIconState extends State<GlassAppIcon>
 
   Future<void> _loadIcon() async {
     try {
-      final channel = MethodChannel(
-        'com.danger.danger_launcher/launcher',
-      );
-      final Uint8List? bytes = await channel.invokeMethod<Uint8List>(
-        'getAppIcon',
-        {'packageName': widget.app.packageName},
-      );
-      if (bytes != null && mounted) {
+      final bytes = await _api.getAppIcon(widget.app.packageName);
+      if (mounted) {
         setState(() {
-          _iconImage = Image.memory(bytes, fit: BoxFit.contain);
+          _iconBytes = bytes;
+          _loading = false;
         });
       }
-    } catch (_) {}
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
@@ -110,17 +112,35 @@ class _GlassAppIconState extends State<GlassAppIcon>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // App icon or fallback
+                  // App icon or loading/fallback
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: SizedBox(
                       width: iconSize,
                       height: iconSize,
-                      child: _iconImage ?? Icon(
-                        Icons.apps,
-                        color: Colors.white.withOpacity(0.7),
-                        size: iconSize * 0.7,
-                      ),
+                      child: _iconBytes != null
+                          ? Image.memory(
+                              _iconBytes!,
+                              fit: BoxFit.contain,
+                              width: iconSize,
+                              height: iconSize,
+                            )
+                          : _loading
+                              ? const Center(
+                                  child: SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                )
+                              : Icon(
+                                  Icons.apps,
+                                  color: Colors.white.withOpacity(0.7),
+                                  size: iconSize * 0.7,
+                                ),
                     ),
                   ),
                   const SizedBox(height: 4),

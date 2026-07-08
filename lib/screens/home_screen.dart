@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/installed_app.dart';
@@ -33,6 +34,10 @@ class _HomeScreenState extends State<HomeScreen>
   bool _showDrawer = false;
   int _currentPage = 0;
   String _dateTime = '';
+  bool _refreshing = false;
+
+  static const int appsPerPage = 8;
+  static const int columns = 4;
 
   @override
   void initState() {
@@ -65,6 +70,27 @@ class _HomeScreenState extends State<HomeScreen>
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => SettingsScreen(api: widget.api),
     ));
+  }
+
+  Future<void> _pullToRefresh() async {
+    setState(() => _refreshing = true);
+    await widget.onRefresh();
+    setState(() => _refreshing = false);
+  }
+
+  void _nextPage() {
+    final totalPages = (widget.apps.length / appsPerPage).ceil();
+    if (_currentPage < totalPages - 1) {
+      setState(() => _currentPage++);
+      HapticFeedback.lightImpact();
+    }
+  }
+
+  void _prevPage() {
+    if (_currentPage > 0) {
+      setState(() => _currentPage--);
+      HapticFeedback.lightImpact();
+    }
   }
 
   @override
@@ -110,6 +136,30 @@ class _HomeScreenState extends State<HomeScreen>
                 ],
               ),
             ),
+            // Page navigation arrows (side gestures)
+            Positioned(
+              left: 0, top: 0, bottom: 0,
+              child: GestureDetector(
+                onTap: _prevPage,
+                child: Container(width: 40, color: Colors.transparent),
+              ),
+            ),
+            Positioned(
+              right: 0, top: 0, bottom: 0,
+              child: GestureDetector(
+                onTap: _nextPage,
+                child: Container(width: 40, color: Colors.transparent),
+              ),
+            ),
+            // Gemini voice trigger pill
+            Positioned(
+              top: 120,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: _buildGeminiTrigger(),
+              ),
+            ),
             // App drawer overlay
             if (_showDrawer)
               AppDrawer(
@@ -121,6 +171,46 @@ class _HomeScreenState extends State<HomeScreen>
           ],
         );
       },
+    );
+  }
+
+  Widget _buildGeminiTrigger() {
+    return GestureDetector(
+      onLongPress: () {
+        HapticFeedback.heavyImpact();
+        // In production: open Gemini overlay / voice query
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Gemini voice trigger activated'),
+            backgroundColor: const Color(0xFF8B5CF6),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      },
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          color: Colors.white.withOpacity(0.08),
+          border: Border.all(
+            color: const Color(0xFF8B5CF6).withOpacity(0.5),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF8B5CF6).withOpacity(0.2),
+              blurRadius: 16,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: const Icon(
+          Icons.auto_awesome,
+          color: Color(0xFF8B5CF6),
+          size: 24,
+        ),
+      ),
     );
   }
 
@@ -190,45 +280,45 @@ class _HomeScreenState extends State<HomeScreen>
             const SizedBox(height: 8),
             Text('Loading apps...',
               style: TextStyle(color: Colors.white.withOpacity(0.5))),
+            if (_refreshing)
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: SizedBox(
+                  width: 20, height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white70,
+                  ),
+                ),
+              ),
           ],
         ),
       );
     }
 
-    final maxApps = (_currentPage + 1) * 8;
-    final visible = pageApps.take(maxApps).toList();
-    final rows = (visible.length / 4).ceil().clamp(0, 3);
+    final startIndex = _currentPage * appsPerPage;
+    final endIndex = min(startIndex + appsPerPage, pageApps.length);
+    final visible = pageApps.sublist(startIndex, endIndex);
+    final rows = (visible.length / columns).ceil();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          for (var row = 0; row < rows; row++)
+          // Page indicator with dots
+          if (pageApps.length > appsPerPage)
             Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  for (var col = 0; col < 4; col++) ...[
-                    if (row * 4 + col < visible.length)
-                      GlassAppIcon(
-                        app: visible[row * 4 + col],
-                        onTap: () =>
-                            _launchApp(visible[row * 4 + col]),
-                      ),
-                  ],
-                ],
-              ),
-            ),
-          // Page dots
-          if (pageApps.length > 8)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.only(bottom: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  for (var i = 0; i < (pageApps.length / 8).ceil(); i++)
+                  GestureDetector(
+                    onTap: _prevPage,
+                    child: Icon(Icons.chevron_left,
+                        color: Colors.white.withOpacity(0.5), size: 20),
+                  ),
+                  for (var i = 0; i < (pageApps.length / appsPerPage).ceil(); i++)
                     Container(
                       width: 6,
                       height: 6,
@@ -240,6 +330,29 @@ class _HomeScreenState extends State<HomeScreen>
                             : Colors.white.withOpacity(0.3),
                       ),
                     ),
+                  GestureDetector(
+                    onTap: _nextPage,
+                    child: Icon(Icons.chevron_right,
+                        color: Colors.white.withOpacity(0.5), size: 20),
+                  ),
+                ],
+              ),
+            ),
+          // App grid rows
+          for (var row = 0; row < rows; row++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  for (var col = 0; col < columns; col++) ...[
+                    if (row * columns + col < visible.length)
+                      GlassAppIcon(
+                        app: visible[row * columns + col],
+                        onTap: () =>
+                            _launchApp(visible[row * columns + col]),
+                      ),
+                  ],
                 ],
               ),
             ),

@@ -30,8 +30,12 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
-    <!-- Query all installed apps for app grid -->
+    <!-- Query all installed apps for app grid and drawer -->
     <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
