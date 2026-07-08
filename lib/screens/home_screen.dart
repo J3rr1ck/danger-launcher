@@ -11,7 +11,7 @@ import 'settings_screen.dart';
 class HomeScreen extends StatefulWidget {
   final List<InstalledApp> apps;
   final LauncherApi api;
-  final VoidCallback onRefresh;
+  final Future<void> Function() onRefresh;
   final VoidCallback? onOpenFeed;
   final VoidCallback? onHome;
 

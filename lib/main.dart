@@ -59,7 +59,7 @@ class _DangerLauncherAppState extends State<DangerLauncherApp> {
 class LauncherRoot extends StatefulWidget {
   final List<InstalledApp> allApps;
   final LauncherApi api;
-  final VoidCallback onRefresh;
+  final Future<void> Function() onRefresh;
 
   const LauncherRoot({
     super.key,

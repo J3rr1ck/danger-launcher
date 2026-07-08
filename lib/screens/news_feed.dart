@@ -1,5 +1,6 @@
-import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/launcher_api.dart';
 
 /// Google Now-style feed with real RSS headlines and local weather.
@@ -76,7 +77,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
     var startIdx = 1;
     final categories = ['Top Stories', 'Technology', 'World'];
 
-    for (var i = 0; i < min(titleMatches.count - startIdx, 20); i++) {
+    for (var i = 0; i < min(titleMatches.length - startIdx, 20); i++) {
       final title = titleMatches.elementAt(i + startIdx).group(1) ?? '';
       final desc = descMatches.elementAt(i + startIdx).group(1) ?? '';
       final link = linkMatches.elementAt(i + startIdx).group(1) ?? '';

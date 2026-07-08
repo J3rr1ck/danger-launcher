@@ -54,8 +54,8 @@ class WeatherApi {
 
   Future<Map<String, dynamic>> getWeather() async {
     try {
-      final Map<String, dynamic> result = await _channel.invokeMethod<Map<String, dynamic>>('getWeather');
-      return result;
+      final Map<String, dynamic>? result = await _channel.invokeMethod<Map<String, dynamic>>('getWeather');
+      return result ?? {'success': false, 'temperature': 72, 'condition': 'Sunny', 'city': 'San Francisco'};
     } catch (e) {
       debugPrint('getWeather error: $e');
       return {'success': false, 'temperature': 72, 'condition': 'Sunny', 'city': 'San Francisco'};
